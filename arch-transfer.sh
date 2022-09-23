@@ -5,6 +5,12 @@ check() {
 	return $?
 }
 
+PKGMGR="sudo pacman -S --noconfirm"
+grep Crystal /etc/issue
+if [[ "$?" == "0" ]]; then
+	PKGMGR="ame --noconfirm ins"
+fi
+
 
 if [[ "$1" == "save" ]]; then
 	if ! [ -x "$(command -v nc)" ]; then
@@ -25,11 +31,13 @@ elif [[ "$1" == "restore" ]]; then
 	fi
 	printf "Termbin url: "
 	read URL
+	echo "Refreshing pacman"
+	sudo pacman -Sy
 	for pkg in $(curl $URL); do
 		check "${pkg}"
 		if [[ "$?" == "1" ]]; then
 			echo "Don't have ${pkg}"
-			ame --noconfirm ins $pkg
+			$PKGMGR $pkg
 		fi
 	done
 else
